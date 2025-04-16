@@ -21,7 +21,7 @@ public class StudyPalsLogController {
 
         Executors.newSingleThreadExecutor().submit(() -> {
             try {
-                URL url = new URL("http://localhost:8001/logs");
+                URL url = new URL("http://192.168.219.135:8001/logs");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoInput(true);
 
