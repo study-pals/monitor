@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>STUDY-PAL 실시간 로그</title>
+
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .log-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .log-meta {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        #logBox {
+            background: #1e1e1e;
+            color: #ccc;
+            padding: 20px;
+            height: 800px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .log-line.error {
+            color: #ff6b6b;
+        }
+
+        .log-line.warn {
+            color: #ffb347;
+        }
+
+        .log-line.info {
+            color: #ffffff;
+        }
+
+        .log-line.debug {
+            color: #999999;
+        }
+
+        .font-buttons {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        button {
+            font-size: 16px;
+            margin: 0 5px;
+            padding: 5px 10px;
+        }
+
+        .back-button {
+            text-decoration: none;
+            font-size: 14px;
+            color: #007bff;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            padding: 5px 10px;
+            background-color: white;
+        }
+
+        .back-button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div></div> <!-- 좌측 공간 비움 -->
+    <a class="back-button" href="/home">← 뒤로가기</a>
+</div>
+
+<div class="log-header">
+    <h1>STUDY-PAL 실시간 로그</h1>
+</div>
+
+<div class="log-meta">
+    📡 서버: <strong>192.168.219.135</strong> | 사용자: <strong>sang</strong> | 컨테이너: <strong>study-pal-container</strong>
+</div>
+
+<div class="font-buttons">
+    <button onclick="decreaseFontSize()">－</button>
+    <button onclick="increaseFontSize()">＋</button>
+</div>
+
+<div id="logBox">
+    [연결 중...]
+</div>
+
+<script>
+    const logBox = document.getElementById("logBox");
+    let fontSize = 14;
+
+    function increaseFontSize() {
+        fontSize += 2;
+        logBox.style.fontSize = fontSize + "px";
+    }
+
+    function decreaseFontSize() {
+        fontSize = Math.max(8, fontSize - 2);
+        logBox.style.fontSize = fontSize + "px";
+    }
+
+    const eventSource = new EventSource("/logs/stream");
+
+    eventSource.onmessage = (event) => {
+        const line = event.data;
+        const div = document.createElement("div");
+        div.textContent = line;
+        div.classList.add("log-line");
+
+        if (line.includes("ERROR")) {
+            div.classList.add("error");
+        } else if (line.includes("WARN")) {
+            div.classList.add("warn");
+        } else if (line.includes("INFO")) {
+            div.classList.add("info");
+        } else if (line.includes("DEBUG")) {
+            div.classList.add("debug");
+        }
+
+        logBox.appendChild(div);
+        logBox.scrollTop = logBox.scrollHeight;
+    };
+
+    eventSource.onerror = (err) => {
+        console.error("SSE 연결 실패:", err);
+        eventSource.close();
+        const div = document.createElement("div");
+        div.textContent = "[연결 종료] 로그 스트림이 끊어졌습니다.";
+        div.style.color = "red";
+        logBox.appendChild(div);
+    };
+</script>
+
+</body>
+</html>

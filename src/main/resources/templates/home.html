@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitoring Home</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #e0f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #0277bd;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: #01579b;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #0288d1;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📊 StudyPal Monitoring Dashboard</h1>
+
+    <div class="section">
+        <div class="section-title">StudyPal Monitor</div>
+        <div class="card-grid">
+            <a href="/studyPal/logs" class="card">
+                <div class="card-title">Spring Logs</div>
+                <div class="card-desc">실시간 로그 스트리밍</div>
+            </a>
+            <a href="#" class="card">
+                <div class="card-title">MySQL Status</div>
+                <div class="card-desc">DB 상태 모니터링 (준비 중)</div>
+            </a>
+            <a href="#" class="card">
+                <div class="card-title">MySQL Logs</div>
+                <div class="card-desc">DB 로그 스트리밍 (준비 중)</div>
+            </a>
+            <a href="#" class="card">
+                <div class="card-title">Redis Status</div>
+                <div class="card-desc">캐시 상태 모니터링 (준비 중)</div>
+            </a>
+            <a href="#" class="card">
+                <div class="card-title">Redis Logs</div>
+                <div class="card-desc">Redis 로그 스트리밍 (준비 중)</div>
+            </a>
+            <a href="#" class="card">
+                <div class="card-title">Jenkins</div>
+                <div class="card-desc">배포 상태 및 Job 모니터링 (준비 중)</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Batch Monitor</div>
+        <div class="card-grid">
+            <a href="/batchPal/jobs" class="card">
+                <div class="card-title">Job Logs</div>
+                <div class="card-desc">Spring Batch 실행 기록</div>
+            </a>
+            <a href="#" class="card">
+                <div class="card-title">Spring Logs</div>
+                <div class="card-desc">배치 서버 로그 (준비 중)</div>
+            </a>
+            <a href="#" class="card">
+                <div class="card-title">MySQL Status</div>
+                <div class="card-desc">DB 상태 모니터링 (준비 중)</div>
+            </a>
+            <a href="#" class="card">
+                <div class="card-title">Jenkins</div>
+                <div class="card-desc">배포 상태 (준비 중)</div>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
