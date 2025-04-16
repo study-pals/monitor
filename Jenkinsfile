@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE_NAME = 'monitoring-pal:latest'
+        DOCKER_IMAGE_FILE = 'monitoring-pal.tar.gz'
+
+        // Config‑file‑management 플러그인에 등록한 파일 ID
+        ENV_FILE_ID       = 'env-file'
+    }
+
+    stages {
+        /* 1) 환경 변수 로드 ---------------------------------------------- */
+        stage('Init Env') {
+            steps {
+                configFileProvider([configFile(fileId: ENV_FILE_ID, variable: 'ENV_SRC')]) {
+                    script {
+                        // 1) 워크스페이스에 .env 파일로 복사
+                        sh 'cp "$ENV_SRC" "$WORKSPACE/.env"'
+
+                        // 2) 전역 변수로 경로 보존
+                        env.ENV_FILE_PATH = "$WORKSPACE/.env"
+
+                        // 3) 프로퍼티 로드 → env 주입
+                        readProperties(file: env.ENV_FILE_PATH).each { k, v ->
+                            env."$k" = v
+                        }
+                    }
+                }
+            }
+        }
+
+        /* 2) Git 체크아웃 -------------------------------------------------- */
+        stage('CheckOut') {
+            steps {
+                checkout scm
+            }
+        }
+
+        /* 3) 빌드 --------------------------------------------------------- */
+        stage('Build') {
+            steps {
+                sh './gradlew clean build'
+            }
+        }
+
+        /* 4) Docker 이미지 빌드 ------------------------------------------- */
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t ${DOCKER_IMAGE_NAME} ."
+            }
+        }
+
+        /* 5) 이미지 아카이브 ---------------------------------------------- */
+        stage('Save Docker Image') {
+            steps {
+                sh "docker save ${DOCKER_IMAGE_NAME} | gzip > ${DOCKER_IMAGE_FILE}"
+                archiveArtifacts artifacts: "${DOCKER_IMAGE_FILE}"
+            }
+        }
+
+        /* 6) 로컬 배포 ---------------------------------------------------- */
+        stage('Deploy Docker Image Locally') {
+            steps {
+                script {
+                    sh "docker load -i ${DOCKER_IMAGE_FILE}"
+                    sh "docker stop monitoring-pal-container || true"
+                    sh "docker rm   monitoring-pal-container || true"
+
+                    // prod 프로필로 컨테이너 실행. 모든 env 는 env‑file 로 전달
+                    sh """
+                        docker run -d --name monitoring-pal-container -p 8880:8880 \
+                          --env-file ${env.ENV_FILE_PATH} \
+                          -e SPRING_PROFILES_ACTIVE=prod \
+                          ${DOCKER_IMAGE_NAME}
+                    """
+
+                    sh "docker system prune -f"
+                }
+            }
+        }
+    }
+}
