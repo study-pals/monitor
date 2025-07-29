@@ -70,9 +70,10 @@ pipeline {
 
                     // prod 프로필로 컨테이너 실행. 모든 env 는 env‑file 로 전달
                     sh """
-                        docker run -d --name monitoring-pal-container -p 8880:8880 \
-                          --env-file ${env.ENV_FILE_PATH} \
-                          -e SPRING_PROFILES_ACTIVE=prod \
+                        docker run -d --name monitoring-pal-container -p 8880:8880 \\
+                          --env-file ${env.ENV_FILE_PATH} \\
+                          -e SPRING_PROFILES_ACTIVE=prod \\
+                          --network docker_backend \\
                           ${DOCKER_IMAGE_NAME}
                     """
 
